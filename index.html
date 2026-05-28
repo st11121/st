@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SBTI 碳排放目标计算工具</title>
+    <title>SBTI 人格性格测试 - 发现真实的你</title>
     <style>
         * {
             margin: 0;
@@ -19,10 +19,10 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
+            border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
@@ -30,263 +30,382 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px 20px;
+            padding: 50px 20px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5em;
+            font-size: 2.8em;
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
         .header p {
             font-size: 1.1em;
-            opacity: 0.9;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            font-size: 0.95em;
+            opacity: 0.85;
         }
 
         .content {
-            padding: 40px 20px;
+            padding: 40px 30px;
         }
 
-        .section {
-            margin-bottom: 40px;
+        .question-container {
+            display: none;
         }
 
-        .section-title {
+        .question-container.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .question-title {
             font-size: 1.5em;
             color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .question-category {
+            display: inline-block;
+            background: #f0f4ff;
+            color: #667eea;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
         }
 
-        .form-group.full {
-            grid-template-columns: 1fr;
-        }
-
-        .input-block {
+        .options {
             display: flex;
             flex-direction: column;
+            gap: 15px;
         }
 
-        label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-            font-size: 0.95em;
-        }
-
-        input, select {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        input[type="number"] {
-            font-size: 1.1em;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .result-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 25px;
+        .option {
+            padding: 18px 20px;
+            border: 2px solid #e5e7eb;
             border-radius: 10px;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
         }
 
-        .result-card.good {
-            border-left-color: #10b981;
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        .option:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+            transform: translateX(5px);
         }
 
-        .result-card.warning {
-            border-left-color: #f59e0b;
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        .option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
         }
 
-        .result-card.danger {
-            border-left-color: #ef4444;
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-        }
-
-        .result-label {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .result-value {
-            font-size: 2.5em;
-            font-weight: bold;
+        .option-text {
+            font-weight: 500;
             color: #333;
+            font-size: 1.05em;
         }
 
-        .result-unit {
+        .option-score {
             font-size: 0.9em;
-            color: #666;
-            margin-left: 5px;
+            color: #999;
+            margin-top: 5px;
         }
 
         .button-group {
             display: flex;
             gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
+            margin-top: 40px;
+            justify-content: space-between;
         }
 
         button {
-            padding: 15px 30px;
+            padding: 14px 32px;
             font-size: 1em;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
         }
 
-        .btn-calculate {
+        .btn-prev {
+            background: #f3f4f6;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            background: #e5e7eb;
+        }
+
+        .btn-prev:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             flex: 1;
-            min-width: 150px;
         }
 
-        .btn-calculate:hover {
+        .btn-next:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .btn-reset {
-            background: #f3f4f6;
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 结果页面 */
+        .result-page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .result-page.active {
+            display: block;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .result-type {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 1.15em;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-card.hobby {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        }
+
+        .result-card.emotion {
+            border-left-color: #ef4444;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        }
+
+        .result-card.social {
+            border-left-color: #10b981;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        }
+
+        .result-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 12px;
             color: #333;
-            flex: 1;
-            min-width: 150px;
         }
 
-        .btn-reset:hover {
+        .result-card p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 1em;
+        }
+
+        .traits-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .trait-badge {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e5e7eb;
+        }
+
+        .trait-badge h4 {
+            color: #667eea;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .trait-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .trait-unit {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 8px;
             background: #e5e7eb;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
         }
 
-        .btn-export {
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .button-group-result {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            justify-content: center;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .btn-share {
             background: #10b981;
             color: white;
+            padding: 15px 40px;
             flex: 1;
-            min-width: 150px;
+            max-width: 300px;
         }
 
-        .btn-export:hover {
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-share:hover {
             background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
         }
 
-        .info-box {
-            background: #f0f4ff;
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            border-radius: 6px;
+        .start-page {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .start-page.hidden {
+            display: none;
+        }
+
+        .start-emoji {
+            font-size: 5em;
             margin-bottom: 20px;
         }
 
-        .info-box p {
-            color: #333;
+        .start-description {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 30px;
             line-height: 1.6;
         }
 
-        .chart-container {
-            margin-top: 30px;
+        .start-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature {
             padding: 20px;
             background: #f9fafb;
             border-radius: 10px;
+            border: 2px solid #e5e7eb;
         }
 
-        .chart-bar {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+        .feature-emoji {
+            font-size: 2.5em;
+            margin-bottom: 10px;
         }
 
-        .chart-label {
-            width: 150px;
+        .feature-text {
             font-weight: 600;
             color: #333;
         }
 
-        .chart-bar-background {
-            flex: 1;
-            height: 30px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 0 15px;
-        }
-
-        .chart-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.5s;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-weight: 600;
-            font-size: 0.85em;
+            padding: 18px 50px;
+            font-size: 1.1em;
+            margin-top: 30px;
         }
 
-        .chart-value {
-            width: 100px;
-            text-align: right;
-            font-weight: 600;
-            color: #333;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .form-group {
-                grid-template-columns: 1fr;
-            }
-
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .content {
-                padding: 20px 15px;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            .btn-calculate, .btn-reset, .btn-export {
-                width: 100%;
-            }
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
         }
 
         .footer {
@@ -298,421 +417,606 @@
             border-top: 1px solid #e5e7eb;
         }
 
-        .tab-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
 
-        .tab-button {
-            padding: 10px 20px;
-            background: #f3f4f6;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
+            .content {
+                padding: 20px;
+            }
 
-        .tab-button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
+            .button-group {
+                flex-direction: column;
+            }
 
-        .tab-content {
-            display: none;
-        }
+            .question-title {
+                font-size: 1.3em;
+            }
 
-        .tab-content.active {
-            display: block;
+            .option {
+                padding: 15px 16px;
+            }
+
+            .start-features {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌍 SBTI 碳排放目标计算工具</h1>
-            <p>Science Based Targets initiative - 科学碳目标计算平台</p>
+            <h1>🎯 SBTI 人格性格测试</h1>
+            <p>发现真实的你</p>
+            <p class="header-subtitle">基于爱好、情感、社交维度的深度性格分析</p>
         </div>
 
         <div class="content">
-            <!-- 标签页 -->
-            <div class="tab-container">
-                <button class="tab-button active" onclick="switchTab('calculator')">📊 计算器</button>
-                <button class="tab-button" onclick="switchTab('analysis')">📈 分析</button>
-                <button class="tab-button" onclick="switchTab('help')">❓ 帮助</button>
+            <!-- 开始页面 -->
+            <div id="startPage" class="start-page">
+                <div class="start-emoji">🌟</div>
+                <h2 style="font-size: 2em; margin-bottom: 20px; color: #333;">欢迎来到 SBTI 人格测试</h2>
+                <p class="start-description">
+                    SBTI 测试通过分析你的爱好、情感表达方式和社交特点，
+                    为你绘制一份独特的人格画像。<br>
+                    <strong>完成测试仅需 5 分钟，发现真实的自己！</strong>
+                </p>
+
+                <div class="start-features">
+                    <div class="feature">
+                        <div class="feature-emoji">🎮</div>
+                        <div class="feature-text">爱好分析</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-emoji">❤️</div>
+                        <div class="feature-text">情感洞察</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-emoji">👥</div>
+                        <div class="feature-text">社交特征</div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-emoji">📊</div>
+                        <div class="feature-text">个性报告</div>
+                    </div>
+                </div>
+
+                <button class="btn-start" onclick="startTest()">开始测试 🚀</button>
             </div>
 
-            <!-- 计算器标签页 -->
-            <div id="calculator" class="tab-content active">
-                <div class="info-box">
-                    <p>📋 本工具帮助你计算符合 SBTI 要求的科学碳排放目标。请输入你所在组织的排放数据。</p>
+            <!-- 测试页面 -->
+            <div id="testPage" class="test-page hidden">
+                <div class="progress-text">
+                    <span id="currentQuestion">1</span> / <span id="totalQuestions">16</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
 
-                <!-- 基准年数据 -->
-                <div class="section">
-                    <h2 class="section-title">📅 基准年排放数据 (2020年)</h2>
-                    <div class="form-group">
-                        <div class="input-block">
-                            <label>直接排放 (Scope 1) - 吨 CO2e</label>
-                            <input type="number" id="scope1" placeholder="例如: 1500" value="1500" min="0">
-                        </div>
-                        <div class="input-block">
-                            <label>间接能源排放 (Scope 2) - 吨 CO2e</label>
-                            <input type="number" id="scope2" placeholder="例如: 3200" value="3200" min="0">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-block">
-                            <label>其他间接排放 (Scope 3) - 吨 CO2e</label>
-                            <input type="number" id="scope3" placeholder="例如: 8500" value="8500" min="0">
-                        </div>
-                        <div class="input-block">
-                            <label>年收入 - 万元</label>
-                            <input type="number" id="revenue" placeholder="例如: 100000" value="100000" min="0">
-                        </div>
-                    </div>
-                </div>
+                <div id="questionsContainer"></div>
 
-                <!-- 目标年 -->
-                <div class="section">
-                    <h2 class="section-title">🎯 减排目标设置</h2>
-                    <div class="form-group">
-                        <div class="input-block">
-                            <label>近期目标年</label>
-                            <select id="targetYear">
-                                <option value="2025">2025年 (5年目标)</option>
-                                <option value="2030" selected>2030年 (10年目标)</option>
-                                <option value="2035">2035年 (15年目标)</option>
-                            </select>
-                        </div>
-                        <div class="input-block">
-                            <label>目标减排比例 (%)</label>
-                            <input type="number" id="reductionRate" placeholder="例如: 50" value="50" min="0" max="100">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-block">
-                            <label>长期目标年</label>
-                            <select id="longTermYear">
-                                <option value="2040">2040年</option>
-                                <option value="2050" selected>2050年 (碳中和)</option>
-                                <option value="2060">2060年</option>
-                            </select>
-                        </div>
-                        <div class="input-block">
-                            <label>长期目标减排比例 (%)</label>
-                            <input type="number" id="longTermReduction" placeholder="例如: 90" value="90" min="0" max="100">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 按钮组 -->
                 <div class="button-group">
-                    <button class="btn-calculate" onclick="calculateTargets()">🚀 计算目标</button>
-                    <button class="btn-reset" onclick="resetForm()">🔄 重置</button>
-                    <button class="btn-export" onclick="exportResults()">📥 导出结果</button>
-                </div>
-
-                <!-- 计算结果 -->
-                <div id="resultsContainer"></div>
-            </div>
-
-            <!-- 分析标签页 -->
-            <div id="analysis" class="tab-content">
-                <div class="section">
-                    <h2 class="section-title">📊 排放数据分析</h2>
-                    <div class="chart-container" id="analysisChart"></div>
+                    <button class="btn-prev" id="btnPrev" onclick="previousQuestion()" disabled>← 上一题</button>
+                    <button class="btn-next" id="btnNext" onclick="nextQuestion()" disabled>下一题 →</button>
                 </div>
             </div>
 
-            <!-- 帮助标签页 -->
-            <div id="help" class="tab-content">
-                <div class="section">
-                    <h2 class="section-title">❓ 常见问题</h2>
-                    
-                    <div class="info-box" style="margin-bottom: 15px;">
-                        <h3 style="color: #333; margin-bottom: 10px;">什么是 SBTI?</h3>
-                        <p>科学碳目标倡议 (Science Based Targets initiative) 是一个全球平台，帮助企业制定符合气候科学要求的碳排放目标，与《巴黎协定》1.5°C 情景保持一致。</p>
-                    </div>
+            <!-- 结果页面 -->
+            <div id="resultPage" class="result-page">
+                <div class="result-header">
+                    <div id="resultEmoji" style="font-size: 3em; margin-bottom: 15px;"></div>
+                    <div class="result-type" id="resultType"></div>
+                    <div class="result-description" id="resultDescription"></div>
+                </div>
 
-                    <div class="info-box" style="margin-bottom: 15px;">
-                        <h3 style="color: #333; margin-bottom: 10px;">三个范围（Scope）是什么？</h3>
-                        <p><strong>Scope 1:</strong> 组织直接控制的排放（如燃料燃烧、车辆）</p>
-                        <p><strong>Scope 2:</strong> 购买电力、蒸汽、热水等间接排放</p>
-                        <p><strong>Scope 3:</strong> 供应链、员工通勤等其他间接排放</p>
-                    </div>
+                <div id="resultDetails"></div>
 
-                    <div class="info-box" style="margin-bottom: 15px;">
-                        <h3 style="color: #333; margin-bottom: 10px;">1.5°C 情景的要求是什么？</h3>
-                        <p>根据 IPCC 和 SBTI 标准，到 2030 年需要相比 2020 年减少 45-50% 的排放，到 2050 年实现净零碳排放。</p>
-                    </div>
+                <div class="traits-container" id="traitsContainer"></div>
 
-                    <div class="info-box" style="margin-bottom: 15px;">
-                        <h3 style="color: #333; margin-bottom: 10px;">如何使用本工具？</h3>
-                        <p>1️⃣ 输入组织的基准年排放数据</p>
-                        <p>2️⃣ 设置目标年份和减排比例</p>
-                        <p>3️⃣ 点击"计算目标"查看结果</p>
-                        <p>4️⃣ 导出结果用于报告</p>
-                    </div>
+                <div class="button-group-result">
+                    <button class="btn-restart" onclick="restartTest()">重新测试 🔄</button>
+                    <button class="btn-share" onclick="shareResult()">分享结果 📤</button>
                 </div>
             </div>
         </div>
 
         <div class="footer">
-            <p>SBTI 碳目标计算工具 v1.0 | 所有人免费使用 | <a href="https://sciencebasedtargets.org/" target="_blank" style="color: #667eea; text-decoration: none;">📍 访问 SBTI 官网</a></p>
+            <p>SBTI 人格性格测试 v1.0 | 完全免费 | 保护隐私 | 所有人都可以使用</p>
         </div>
     </div>
 
     <script>
-        // 切换标签页
-        function switchTab(tabName) {
-            // 隐藏所有标签页
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.classList.remove('active'));
+        // 测试数据
+        const questions = [
+            // 爱好相关 (Questions 1-5)
+            {
+                id: 1,
+                category: '爱好偏好',
+                title: '你最喜欢的活动类型是什么？',
+                options: [
+                    { text: '户外运动、登山、旅游', value: 5, type: 'hobby' },
+                    { text: '看书、写作、思考', value: 4, type: 'hobby' },
+                    { text: '游戏、竞技、挑战', value: 3, type: 'hobby' },
+                    { text: '创意活动、艺术创作', value: 2, type: 'hobby' },
+                    { text: '社交聚会、参加活动', value: 1, type: 'hobby' }
+                ]
+            },
+            {
+                id: 2,
+                category: '爱好偏好',
+                title: '在闲暇时间，你倾向于...',
+                options: [
+                    { text: '一个人静静享受', value: 5, type: 'hobby' },
+                    { text: '和亲密的朋友一起', value: 3, type: 'hobby' },
+                    { text: '参加大型社交活动', value: 1, type: 'hobby' },
+                    { text: '尝试新的事物', value: 2, type: 'hobby' },
+                    { text: '完成某个目标或项目', value: 4, type: 'hobby' }
+                ]
+            },
+            {
+                id: 3,
+                category: '爱好偏好',
+                title: '你更喜欢的娱乐方式是...',
+                options: [
+                    { text: '电影、音乐、电视', value: 1, type: 'hobby' },
+                    { text: '运动、健身、竞技', value: 3, type: 'hobby' },
+                    { text: '学习、研究、深度思考', value: 5, type: 'hobby' },
+                    { text: '艺术、手工、设计', value: 2, type: 'hobby' },
+                    { text: '社交、聚会、互动游戏', value: 1, type: 'hobby' }
+                ]
+            },
+            {
+                id: 4,
+                category: '爱好偏好',
+                title: '在旅行时，你最想做的是...',
+                options: [
+                    { text: '深入体验当地文化', value: 4, type: 'hobby' },
+                    { text: '挑战冒险项目', value: 5, type: 'hobby' },
+                    { text: '舒适地放松休闲', value: 1, type: 'hobby' },
+                    { text: '拍照分享到社交媒体', value: 1, type: 'hobby' },
+                    { text: '认识新朋友', value: 2, type: 'hobby' }
+                ]
+            },
+            {
+                id: 5,
+                category: '爱好偏好',
+                title: '你最近一个月最常做的事是...',
+                options: [
+                    { text: '沉浸在某个爱好中', value: 4, type: 'hobby' },
+                    { text: '社交、聚会、交友', value: 1, type: 'hobby' },
+                    { text: '工作、学习、自我提升', value: 5, type: 'hobby' },
+                    { text: '娱乐、游戏、休闲', value: 2, type: 'hobby' },
+                    { text: '处理日常琐事', value: 3, type: 'hobby' }
+                ]
+            },
 
-            // 移除所有按钮的激活状态
-            const buttons = document.querySelectorAll('.tab-button');
-            buttons.forEach(btn => btn.classList.remove('active'));
+            // 情感相关 (Questions 6-11)
+            {
+                id: 6,
+                category: '情感特质',
+                title: '当遇到困难时，你通常...',
+                options: [
+                    { text: '独自承受，内化情绪', value: 5, type: 'emotion' },
+                    { text: '向信任的人倾诉', value: 3, type: 'emotion' },
+                    { text: '立即寻求帮助', value: 1, type: 'emotion' },
+                    { text: '冷静分析，制定计划', value: 4, type: 'emotion' },
+                    { text: '积极寻找解决方案', value: 2, type: 'emotion' }
+                ]
+            },
+            {
+                id: 7,
+                category: '情感特质',
+                title: '你对情感的态度是...',
+                options: [
+                    { text: '理性优先，很少表露', value: 5, type: 'emotion' },
+                    { text: '适度表达，控制得当', value: 3, type: 'emotion' },
+                    { text: '热情洋溢，充分表达', value: 1, type: 'emotion' },
+                    { text: '深思熟虑，谨慎表达', value: 4, type: 'emotion' },
+                    { text: '顺其自然，随感而动', value: 2, type: 'emotion' }
+                ]
+            },
+            {
+                id: 8,
+                category: '情感特质',
+                title: '别人称赞你时，你会...',
+                options: [
+                    { text: '感到内疚或尴尬', value: 5, type: 'emotion' },
+                    { text: '感到满足和高兴', value: 2, type: 'emotion' },
+                    { text: '感到自豪和被认可', value: 1, type: 'emotion' },
+                    { text: '分析其真实性', value: 4, type: 'emotion' },
+                    { text: '简单道谢', value: 3, type: 'emotion' }
+                ]
+            },
+            {
+                id: 9,
+                category: '情感特质',
+                title: '你处理悲伤情绪的方式是...',
+                options: [
+                    { text: '深度反思，寻求意义', value: 5, type: 'emotion' },
+                    { text: '倾诉给朋友', value: 2, type: 'emotion' },
+                    { text: '分散注意力，转移情绪', value: 1, type: 'emotion' },
+                    { text: '逐步调节，恢复平衡', value: 3, type: 'emotion' },
+                    { text: '通过爱好宣泄', value: 4, type: 'emotion' }
+                ]
+            },
+            {
+                id: 10,
+                category: '情感特质',
+                title: '在感情关系中，你最看重的是...',
+                options: [
+                    { text: '深度理解与精神共鸣', value: 5, type: 'emotion' },
+                    { text: '相互信任与安全感', value: 3, type: 'emotion' },
+                    { text: '激情与兴奋', value: 1, type: 'emotion' },
+                    { text: '稳定性与承诺', value: 4, type: 'emotion' },
+                    { text: '自由与独立', value: 2, type: 'emotion' }
+                ]
+            },
+            {
+                id: 11,
+                category: '情感特质',
+                title: '你对未来的态度是...',
+                options: [
+                    { text: '充满希望和期待', value: 1, type: 'emotion' },
+                    { text: '务实，有具体计划', value: 3, type: 'emotion' },
+                    { text: '有些忧虑，但坚持努力', value: 4, type: 'emotion' },
+                    { text: '活在当下，随遇而安', value: 2, type: 'emotion' },
+                    { text: '深思熟虑，略显担忧', value: 5, type: 'emotion' }
+                ]
+            },
 
-            // 显示选中的标签页
-            document.getElementById(tabName).classList.add('active');
+            // 社交相关 (Questions 12-16)
+            {
+                id: 12,
+                category: '社交风格',
+                title: '在陌生的社交场合，你通常...',
+                options: [
+                    { text: '主动出击，与人交流', value: 1, type: 'social' },
+                    { text: '等待，观察他人', value: 5, type: 'social' },
+                    { text: '寻找志同道合的人', value: 3, type: 'social' },
+                    { text: '感到不适，想离开', value: 5, type: 'social' },
+                    { text: '跟随朋友，适应环境', value: 2, type: 'social' }
+                ]
+            },
+            {
+                id: 13,
+                category: '社交风格',
+                title: '你倾向于有...',
+                options: [
+                    { text: '很多朋友和熟人', value: 1, type: 'social' },
+                    { text: '少数亲密的朋友', value: 5, type: 'social' },
+                    { text: '既有亲密友谊，也有广泛人脉', value: 3, type: 'social' },
+                    { text: '主要是工作或兴趣相关的联系', value: 2, type: 'social' },
+                    { text: '更多是网络上的联系', value: 1, type: 'social' }
+                ]
+            },
+            {
+                id: 14,
+                category: '社交风格',
+                title: '在团队中，你的角色通常是...',
+                options: [
+                    { text: '领导者、倡导者', value: 1, type: 'social' },
+                    { text: '默默贡献者、支持者', value: 5, type: 'social' },
+                    { text: '创意提供者', value: 2, type: 'social' },
+                    { text: '执行者、完成者', value: 3, type: 'social' },
+                    { text: '协调者、维和者', value: 4, type: 'social' }
+                ]
+            },
+            {
+                id: 15,
+                category: '社交风格',
+                title: '你最不能忍受的是...',
+                options: [
+                    { text: '被完全忽视', value: 1, type: 'social' },
+                    { text: '过度的社交互动', value: 5, type: 'social' },
+                    { text: '虚伪和表面关系', value: 3, type: 'social' },
+                    { text: '冲突和不和谐', value: 4, type: 'social' },
+                    { text: '控制欲强的人', value: 2, type: 'social' }
+                ]
+            },
+            {
+                id: 16,
+                category: '社交风格',
+                title: '与他人沟通时，你倾向于...',
+                options: [
+                    { text: '热情、直接、开放', value: 1, type: 'social' },
+                    { text: '谨慎、深思、倾听', value: 5, type: 'social' },
+                    { text: '有针对性、务实、高效', value: 3, type: 'social' },
+                    { text: '温和、考虑他人感受', value: 4, type: 'social' },
+                    { text: '幽默、轻松、灵活', value: 2, type: 'social' }
+                ]
+            }
+        ];
 
-            // 激活对应的按钮
-            event.target.classList.add('active');
+        // 性格类型数据
+        const personalityTypes = {
+            'SEEKER': {
+                name: '探索者',
+                emoji: '🔍',
+                description: '你是一个好奇心旺盛、喜欢冒险的人。你对新事物充满热情，喜欢在生活中寻求刺激和挑战。你的情感丰富而热烈，社交活跃，乐于与人互动。',
+                hobby: '多才多艺，热爱探索',
+                emotion: '热情而开放',
+                social: '社交型、外向、主动'
+            },
+            'THINKER': {
+                name: '思考者',
+                emoji: '🧠',
+                description: '你是一个理性、深思熟虑的人。你注重逻辑和分析，倾向于独处和沉思。你的情感控制得当，社交较为谨慎。你追求理解和真理，喜欢深度思考。',
+                hobby: '专注、深度的兴趣',
+                emotion: '理性而内敛',
+                social: '内向型、谨慎、深思'
+            },
+            'CREATOR': {
+                name: '创造者',
+                emoji: '🎨',
+                description: '你是一个富有创意和想象力的人。你倾向于用独特的方式表达自己，对艺术和美感敏感。你的情感表达独特，社交风格也较为个性化。你喜欢打破常规，追求自我实现。',
+                hobby: '创意、艺术、个性',
+                emotion: '敏感而富有表达力',
+                social: '独立型、创新、个性'
+            },
+            'CONNECTOR': {
+                name: '连接者',
+                emoji: '🤝',
+                description: '你是一个温暖、善解人意的人。你重视关系和联系，具有很强的共情能力。你的情感温和而稳定，社交活跃但不失分寸。你是天生的调解者和支持者，能给他人带来安慰和信任。',
+                hobby: '人际互动、帮助他人',
+                emotion: '温暖而稳定',
+                social: '友善型、支持、平衡'
+            },
+            'ACHIEVER': {
+                name: '成就者',
+                emoji: '🏆',
+                description: '你是一个目标导向、充满动力的人。你有明确的目标和计划，且有执行力。你的情感受到目标和成就的驱动，社交为了实现目标而展开。你追求卓越和认可，是团队中的推动力。',
+                hobby: '竞技、挑战、目标',
+                emotion: '驱动而专注',
+                social: '进取型、领导、实效'
+            }
+        };
 
-            // 如果切换到分析标签页，更新图表
-            if (tabName === 'analysis') {
-                generateAnalysisChart();
+        let currentQuestion = 0;
+        let answers = {};
+        let scores = { hobby: 0, emotion: 0, social: 0 };
+
+        function startTest() {
+            document.getElementById('startPage').classList.add('hidden');
+            const testPage = document.getElementById('testPage');
+            testPage.classList.remove('hidden');
+            
+            // 生成题目
+            const container = document.getElementById('questionsContainer');
+            questions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question-container' + (index === 0 ? ' active' : '');
+                div.id = 'question-' + q.id;
+                
+                let optionsHTML = '';
+                q.options.forEach(option => {
+                    optionsHTML += `
+                        <div class="option" onclick="selectOption(${q.id}, ${option.value}, this)" data-value="${option.value}">
+                            <div class="option-text">${option.text}</div>
+                        </div>
+                    `;
+                });
+
+                div.innerHTML = `
+                    <div class="question-category">${q.category}</div>
+                    <div class="question-title">${q.title}</div>
+                    <div class="options">${optionsHTML}</div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('totalQuestions').textContent = questions.length;
+            updateProgress();
+        }
+
+        function selectOption(qId, value, element) {
+            // 移除同组的其他选择
+            const parent = element.parentElement;
+            parent.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+
+            // 记录答案
+            const question = questions.find(q => q.id === qId);
+            answers[qId] = value;
+            const type = question.options.find(o => o.value === value).type;
+            
+            // 启用下一题按钮
+            document.getElementById('btnNext').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                if (!answers[currentQuestion + 1]) {
+                    alert('请先选择一个答案！');
+                    return;
+                }
+                currentQuestion++;
+                updateQuestion();
+            } else if (currentQuestion === questions.length - 1) {
+                if (!answers[questions.length]) {
+                    alert('请先选择一个答案！');
+                    return;
+                }
+                calculateResults();
             }
         }
 
-        // 计算目标
-        function calculateTargets() {
-            const scope1 = parseFloat(document.getElementById('scope1').value) || 0;
-            const scope2 = parseFloat(document.getElementById('scope2').value) || 0;
-            const scope3 = parseFloat(document.getElementById('scope3').value) || 0;
-            const revenue = parseFloat(document.getElementById('revenue').value) || 1;
-            const targetYear = parseInt(document.getElementById('targetYear').value);
-            const reductionRate = parseFloat(document.getElementById('reductionRate').value) / 100 || 0;
-            const longTermYear = parseInt(document.getElementById('longTermYear').value);
-            const longTermReduction = parseFloat(document.getElementById('longTermReduction').value) / 100 || 0;
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                updateQuestion();
+            }
+        }
 
-            // 基准排放
-            const baselineEmissions = scope1 + scope2 + scope3;
+        function updateQuestion() {
+            // 隐藏所有问题
+            document.querySelectorAll('.question-container').forEach(q => q.classList.remove('active'));
+            // 显示当前问题
+            document.getElementById('question-' + (currentQuestion + 1)).classList.add('active');
 
-            // 近期目标排放
-            const nearTermEmissions = baselineEmissions * (1 - reductionRate);
-
-            // 长期目标排放
-            const longTermEmissions = baselineEmissions * (1 - longTermReduction);
-
-            // 排放强度
-            const baselineIntensity = (baselineEmissions / revenue).toFixed(4);
-            const targetIntensity = (nearTermEmissions / revenue).toFixed(4);
-
-            // 年均减排率
-            const years = targetYear - 2020;
-            const annualReductionRate = (1 - Math.pow(nearTermEmissions / baselineEmissions, 1 / years)) * 100;
-
-            // 评估
-            let assessment = '✅ 符合1.5°C情景';
-            if (reductionRate < 0.45) {
-                assessment = '⚠️ 未达到1.5°C目标（建议≥45%）';
+            // 恢复之前的选择
+            if (answers[currentQuestion + 1]) {
+                const currentQContainer = document.getElementById('question-' + (currentQuestion + 1));
+                const options = currentQContainer.querySelectorAll('.option');
+                options.forEach(opt => {
+                    if (parseInt(opt.dataset.value) === answers[currentQuestion + 1]) {
+                        opt.classList.add('selected');
+                    }
+                });
             }
 
-            // 生成结果
-            const resultsHTML = `
-                <div class="section" style="margin-top: 30px;">
-                    <h2 class="section-title">📊 计算结果</h2>
-                    
-                    <div class="results-grid">
-                        <div class="result-card">
-                            <div class="result-label">基准年排放总量</div>
-                            <div class="result-value">${baselineEmissions.toLocaleString()}<span class="result-unit">吨 CO2e</span></div>
-                        </div>
+            updateProgress();
+        }
 
-                        <div class="result-card ${reductionRate >= 0.5 ? 'good' : reductionRate >= 0.45 ? 'warning' : 'danger'}">
-                            <div class="result-label">近期目标年排放</div>
-                            <div class="result-value">${nearTermEmissions.toLocaleString('en-US', {maximumFractionDigits: 0})}<span class="result-unit">吨 CO2e</span></div>
-                            <div style="font-size: 0.9em; margin-top: 8px; color: #666;">${targetYear}年需减少 ${(reductionRate * 100).toFixed(1)}%</div>
-                        </div>
+        function updateProgress() {
+            document.getElementById('currentQuestion').textContent = currentQuestion + 1;
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
 
-                        <div class="result-card">
-                            <div class="result-label">长期目标排放</div>
-                            <div class="result-value">${longTermEmissions.toLocaleString('en-US', {maximumFractionDigits: 0})}<span class="result-unit">吨 CO2e</span></div>
-                            <div style="font-size: 0.9em; margin-top: 8px; color: #666;">${longTermYear}年</div>
-                        </div>
+            // 更新按钮状态
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            document.getElementById('btnNext').disabled = !answers[currentQuestion + 1];
 
-                        <div class="result-card">
-                            <div class="result-label">年均减排率</div>
-                            <div class="result-value">${annualReductionRate.toFixed(2)}<span class="result-unit">%</span></div>
-                            <div style="font-size: 0.9em; margin-top: 8px; color: #666;">每年需减少</div>
-                        </div>
+            // 最后一题时，改变按钮文本
+            if (currentQuestion === questions.length - 1) {
+                document.getElementById('btnNext').textContent = '完成测试 ✓';
+            } else {
+                document.getElementById('btnNext').textContent = '下一题 →';
+            }
+        }
 
-                        <div class="result-card">
-                            <div class="result-label">基准排放强度</div>
-                            <div class="result-value">${baselineIntensity}<span class="result-unit">吨/万元</span></div>
-                        </div>
+        function calculateResults() {
+            // 计算各维度得分
+            questions.forEach(q => {
+                const answer = answers[q.id];
+                const type = q.options.find(o => o.value === answer).type;
+                
+                if (type === 'hobby') scores.hobby += answer;
+                else if (type === 'emotion') scores.emotion += answer;
+                else if (type === 'social') scores.social += answer;
+            });
 
-                        <div class="result-card">
-                            <div class="result-label">目标排放强度</div>
-                            <div class="result-value">${targetIntensity}<span class="result-unit">吨/万元</span></div>
-                        </div>
+            // 标准化得分
+            scores.hobby = Math.round((scores.hobby / 25) * 100);
+            scores.emotion = Math.round((scores.emotion / 30) * 100);
+            scores.social = Math.round((scores.social / 25) * 100);
+
+            // 确定人格类型
+            const personalityType = determinePersonality();
+
+            // 显示结果
+            showResults(personalityType);
+        }
+
+        function determinePersonality() {
+            // 基于三个维度的得分确定人格类型
+            const h = scores.hobby;
+            const e = scores.emotion;
+            const s = scores.social;
+
+            // 爱好: 高=探险/创意, 低=稳定
+            // 情感: 高=内敛/深思, 低=外向/热情
+            // 社交: 高=独立, 低=联系/团队
+
+            if (h > 60 && s > 60) return 'SEEKER'; // 探索者
+            if (h < 40 && e > 60) return 'THINKER'; // 思考者
+            if (h > 60 && e < 40) return 'CREATOR'; // 创造者
+            if (e < 50 && s < 50) return 'CONNECTOR'; // 连接者
+            return 'ACHIEVER'; // 成就者
+        }
+
+        function showResults(type) {
+            document.getElementById('testPage').classList.add('hidden');
+            const resultPage = document.getElementById('resultPage');
+            resultPage.classList.add('active');
+
+            const personality = personalityTypes[type];
+
+            document.getElementById('resultEmoji').textContent = personality.emoji;
+            document.getElementById('resultType').textContent = personality.name;
+            document.getElementById('resultDescription').textContent = personality.description;
+
+            // 显示详细卡片
+            const detailsHTML = `
+                <div class="result-card hobby">
+                    <h3>🎮 爱好特征</h3>
+                    <p>${personality.hobby}</p>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: ${scores.hobby}%; background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);"></div>
                     </div>
-
-                    <div class="info-box" style="margin-top: 30px; font-size: 1.1em; background: ${reductionRate >= 0.45 ? 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)' : 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)'};">
-                        <h3 style="margin-bottom: 10px; color: #333;">${assessment}</h3>
-                        <p style="color: #666; line-height: 1.6;">
-                            根据 IPCC 和 SBTI 标准，与 1.5°C 气候情景保持一致需要在 ${targetYear} 年前实现 45-50% 的排放减少。
-                            你的目标为 ${(reductionRate * 100).toFixed(1)}%，${reductionRate >= 0.45 ? '已达到' : '未达到'}要求。
-                        </p>
+                </div>
+                <div class="result-card emotion">
+                    <h3>❤️ 情感特质</h3>
+                    <p>${personality.emotion}</p>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: ${scores.emotion}%; background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);"></div>
                     </div>
-
-                    <div class="chart-container" style="margin-top: 30px;">
-                        <h3 style="margin-bottom: 20px; color: #333;">排放路径规划</h3>
-                        <div class="chart-bar">
-                            <div class="chart-label">2020基准年</div>
-                            <div class="chart-bar-background">
-                                <div class="chart-bar-fill" style="width: 100%;">100%</div>
-                            </div>
-                            <div class="chart-value">${baselineEmissions.toLocaleString()}</div>
-                        </div>
-                        <div class="chart-bar">
-                            <div class="chart-label">${targetYear}目标年</div>
-                            <div class="chart-bar-background">
-                                <div class="chart-bar-fill" style="width: ${(100 - reductionRate * 100)}%; background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);"></div>
-                            </div>
-                            <div class="chart-value">${nearTermEmissions.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
-                        </div>
-                        <div class="chart-bar">
-                            <div class="chart-label">${longTermYear}长期目标</div>
-                            <div class="chart-bar-background">
-                                <div class="chart-bar-fill" style="width: ${(100 - longTermReduction * 100)}%; background: linear-gradient(90deg, #10b981 0%, #059669 100%);"></div>
-                            </div>
-                            <div class="chart-value">${longTermEmissions.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
-                        </div>
+                </div>
+                <div class="result-card social">
+                    <h3>👥 社交风格</h3>
+                    <p>${personality.social}</p>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: ${scores.social}%; background: linear-gradient(90deg, #10b981 0%, #059669 100%);"></div>
                     </div>
                 </div>
             `;
+            document.getElementById('resultDetails').innerHTML = detailsHTML;
 
-            document.getElementById('resultsContainer').innerHTML = resultsHTML;
-            window.lastResults = { baselineEmissions, nearTermEmissions, longTermEmissions, scope1, scope2, scope3, targetYear, longTermYear };
-        }
-
-        // 重置表单
-        function resetForm() {
-            document.getElementById('scope1').value = '1500';
-            document.getElementById('scope2').value = '3200';
-            document.getElementById('scope3').value = '8500';
-            document.getElementById('revenue').value = '100000';
-            document.getElementById('targetYear').value = '2030';
-            document.getElementById('reductionRate').value = '50';
-            document.getElementById('longTermYear').value = '2050';
-            document.getElementById('longTermReduction').value = '90';
-            document.getElementById('resultsContainer').innerHTML = '';
-        }
-
-        // 导出结果
-        function exportResults() {
-            if (!window.lastResults) {
-                alert('请先点击"计算目标"生成结果！');
-                return;
-            }
-
-            const results = window.lastResults;
-            const targetYear = parseInt(document.getElementById('targetYear').value);
-            const longTermYear = parseInt(document.getElementById('longTermYear').value);
-            const reductionRate = parseFloat(document.getElementById('reductionRate').value);
-            const longTermReduction = parseFloat(document.getElementById('longTermReduction').value);
-
-            const text = `SBTI 碳排放目标计算报告
-═════════════════════════
-
-生成时间: ${new Date().toLocaleString('zh-CN')}
-
-【基准年数据】
-├─ Scope 1 (直接排放): ${results.scope1} 吨 CO2e
-├─ Scope 2 (间接能源): ${results.scope2} 吨 CO2e
-├─ Scope 3 (其他间接): ${results.scope3} 吨 CO2e
-└─ 合计: ${results.baselineEmissions} 吨 CO2e
-
-【近期目标 (${targetYear}年)】
-├─ 目标减排: ${reductionRate}%
-├─ 目标排放: ${Math.round(results.nearTermEmissions)} 吨 CO2e
-└─ 符合 1.5°C 情景: ${reductionRate >= 45 ? '✅ 是' : '❌ 否'}
-
-【长期目标 (${longTermYear}年)】
-├─ 目标减排: ${longTermReduction}%
-└─ 目标排放: ${Math.round(results.longTermEmissions)} 吨 CO2e
-
-【建议】
-1. 制定详细的减排行动计划
-2. 投资可再生能源和能效改进
-3. 定期监测和报告进展
-4. 寻求第三方验证
-5. 与供应链合作伙伴沟通减排目标
-
-═════════════════════════
-更多信息: https://sciencebasedtargets.org/`;
-
-            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `SBTI_目标报告_${new Date().toISOString().split('T')[0]}.txt`;
-            link.click();
-        }
-
-        // 生成分析图表
-        function generateAnalysisChart() {
-            const scope1 = parseFloat(document.getElementById('scope1').value) || 0;
-            const scope2 = parseFloat(document.getElementById('scope2').value) || 0;
-            const scope3 = parseFloat(document.getElementById('scope3').value) || 0;
-            const total = scope1 + scope2 + scope3;
-
-            if (total === 0) {
-                document.getElementById('analysisChart').innerHTML = '<p style="color: #666;">请先在计算器中输入排放数据</p>';
-                return;
-            }
-
-            const scope1Percent = (scope1 / total * 100).toFixed(1);
-            const scope2Percent = (scope2 / total * 100).toFixed(1);
-            const scope3Percent = (scope3 / total * 100).toFixed(1);
-
-            const html = `
-                <h3 style="margin-bottom: 20px; color: #333;">排放范围分布</h3>
-                <div class="chart-bar">
-                    <div class="chart-label">Scope 1 (直接)</div>
-                    <div class="chart-bar-background">
-                        <div class="chart-bar-fill" style="width: ${scope1Percent}%; background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);">${scope1Percent}%</div>
-                    </div>
-                    <div class="chart-value">${scope1.toLocaleString()}</div>
+            // 显示得分
+            const traitsHTML = `
+                <div class="trait-badge">
+                    <h4>🎮 爱好指数</h4>
+                    <div class="trait-value">${scores.hobby}<span class="trait-unit">%</span></div>
                 </div>
-                <div class="chart-bar">
-                    <div class="chart-label">Scope 2 (能源)</div>
-                    <div class="chart-bar-background">
-                        <div class="chart-bar-fill" style="width: ${scope2Percent}%; background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);">${scope2Percent}%</div>
-                    </div>
-                    <div class="chart-value">${scope2.toLocaleString()}</div>
+                <div class="trait-badge">
+                    <h4>❤️ 情感指数</h4>
+                    <div class="trait-value">${scores.emotion}<span class="trait-unit">%</span></div>
                 </div>
-                <div class="chart-bar">
-                    <div class="chart-label">Scope 3 (其他)</div>
-                    <div class="chart-bar-background">
-                        <div class="chart-bar-fill" style="width: ${scope3Percent}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">${scope3Percent}%</div>
-                    </div>
-                    <div class="chart-value">${scope3.toLocaleString()}</div>
+                <div class="trait-badge">
+                    <h4>👥 社交指数</h4>
+                    <div class="trait-value">${scores.social}<span class="trait-unit">%</span></div>
                 </div>
             `;
+            document.getElementById('traitsContainer').innerHTML = traitsHTML;
 
-            document.getElementById('analysisChart').innerHTML = html;
+            // 保存结果
+            window.lastResult = { type, personality, scores };
         }
 
-        // 初始化
-        window.addEventListener('load', function() {
-            console.log('SBTI 碳目标计算工具已加载');
-        });
+        function restartTest() {
+            currentQuestion = 0;
+            answers = {};
+            scores = { hobby: 0, emotion: 0, social: 0 };
+
+            document.getElementById('resultPage').classList.remove('active');
+            document.getElementById('startPage').classList.remove('hidden');
+            document.getElementById('testPage').classList.add('hidden');
+
+            // 清空问题容器
+            document.getElementById('questionsContainer').innerHTML = '';
+        }
+
+        function shareResult() {
+            if (!window.lastResult) return;
+
+            const { type, personality, scores } = window.lastResult;
+            const text = `我在 SBTI 人格测试中是「${personality.name}${personality.emoji}」\n爱好指数: ${scores.hobby}% | 情感指数: ${scores.emotion}% | 社交指数: ${scores.social}%\n👉 来发现你真实的人格类型吧！`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'SBTI 人格测试',
+                    text: text
+                });
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('结果已复制到剪贴板！');
+            }
+        }
     </script>
 </body>
 </html>
